@@ -1,0 +1,54 @@
+PROJECT REPORT
+
+Title: StackTrace — PL/SQL Nested Block PDA Visualizer
+Subject: PDA (Pushdown Automata)
+
+1. Introduction
+PL/SQL programs contain nested structures such as BEGIN/END blocks, IF/END IF statements, loops, and CASE statements. Every closing marker must match the most recently opened structure. StackTrace visualizes how a Pushdown Automaton (PDA) uses a stack to check this nesting.
+
+2. Problem statement and objective
+Given a PL/SQL-like source snippet, decide whether the supported block markers are correctly nested. Identify mismatched, unexpected, and unclosed markers. Present the scan as an animated stack and a per-block flow diagram. Explain each error and offer a suggested correction that can be applied to the editor buffer.
+
+3. PDA model
+Input: source code scanned for recognized block keywords.
+Stack alphabet: BEGIN, IF, LOOP, CASE.
+Initial stack: empty.
+Transitions: push a block type when its opener is read. On END IF, END LOOP, or END CASE, pop only the matching top symbol. On plain END, pop BEGIN. A mismatch rejects the snippet. At end of input, accept only if the stack is empty and no mismatch occurred.
+
+4. System features
+- Built-in valid, mismatched, and unclosed examples; editable source; local SQL file loading.
+- Animated stack and transition history with line numbers.
+- Per-block flow diagram connecting openers to closers and marking unclosed/mismatched blocks.
+- Expandable diagnostics explain why each error happened and show a suggested code change.
+- One-click application of the suggested edit in the editor, followed by a new analysis.
+- Download of a corrected copy without overwriting the user's source file.
+- Dark/light themes and subtle motion with reduced-motion support.
+
+5. Algorithm
+1. Scan the source, retaining line positions and ignoring comments and quoted text.
+2. Push each recognized opening block onto the stack with a unique identifier.
+3. For each closing marker, compare its expected type with the stack top.
+4. Pop and pair matching markers; record mismatches and unexpected closers.
+5. At end of input, report any remaining open blocks.
+6. Draw a lane for each block, connecting its opener to its closer or to the fault/end position.
+7. Generate a focused explanation and a one-click text suggestion for each issue.
+
+6. Example trace
+Input: BEGIN, IF, END IF, END
+After BEGIN: [BEGIN]
+After IF: [BEGIN, IF]
+After END IF: [BEGIN]
+After END: []
+The empty final stack means the recognized blocks are balanced.
+
+7. Complexity
+For n source characters/tokens, scanning and stack processing take O(n) time. In the worst case, stack memory is O(n) when all recognized openers are nested. Diagram generation is proportional to the number of recognized block actions.
+
+8. Demonstration plan
+Open index.html. Analyze the valid sample and show the stack returning to empty. Select the mismatched sample, expand the error, and point to the red break on the LOOP lane. Apply the suggested swap and show the new ACCEPT result. Then inspect the unclosed sample, apply the missing closer, and download the corrected copy. Finally, load or paste a personal snippet.
+
+9. Limitations and future work
+The visualizer checks a simplified delimiter model and does not validate complete PL/SQL grammar, SQL statements, declarations, or expression syntax. Suggested fixes are text edits for this model and should be reviewed. Future work could add richer parsing, save-dialog integration, and compiler-backed validation.
+
+10. Conclusion
+StackTrace makes PDA stack behavior visible and connects the theory of nested structures to concrete PL/SQL-like examples. Its diagrams, explanations, and suggested fixes turn the checker into an interactive learning and presentation tool.
